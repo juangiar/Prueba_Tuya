@@ -1,0 +1,46 @@
+Query1 = "
+SELECT COUNT(*) AS ordenes_totales FROM orden;
+"
+
+Query2 = "
+SELECT COUNT(DISTINCT cedula) AS ultimos_clientes FROM orden
+WHERE fecha_orden BETWEEN '2021-01-01' AND CURRENT_DATE;
+"
+
+Query3 = "
+SELECT c.cedula, c.nombre, COUNT(o.id_orden) AS ordenes_totales
+FROM cliente c
+LEFT JOIN orden o ON c.cedula = o.cedula
+GROUP BY c.cedula, c.nombre
+ORDER BY ordenes_totales DESC;
+"
+
+Query4 = "
+SELECT c.cedula, c.nombre, c.telefono, o.fecha_orden, p.nombre_producto, d.cantidad
+FROM orden o
+JOIN cliente c ON o.cedula = c.cedula
+JOIN detalle_orden d ON o.id_orden = d.id_orden
+JOIN producto p ON d.id_producto = p.id_producto
+WHERE YEAR(o.fecha_orden) = 2020
+AND o.total_pedido = (
+    SELECT MAX(total_pedido) FROM orden
+    WHERE YEAR(fecha_orden) = 2020);
+"
+
+Query5 = "
+SELECT YEAR(o.fecha_orden) AS año, MONTH(o.fecha_orden) AS mes, SUM(d.precio_unitario * d.cantidad) AS total_vendido
+FROM orden o
+JOIN detalle_orden d ON o.id_orden = d.id_orden
+GROUP BY YEAR(o.fecha_orden), MONTH(o.fecha_orden)
+ORDER BY año, mes;
+"
+
+Query6 = "
+SELECT p.nombre_producto, COUNT(*) AS numero_compras, SUM(d.precio_unitario * d.cantidad) AS total_gastado
+FROM orden o
+JOIN detalle_orden d ON o.id_orden = d.id_orden
+JOIN producto p ON d.id_producto = p.id_producto
+WHERE o.cedula = 123456
+GROUP BY p.nombre_producto
+ORDER BY total_gastado DESC;
+"
